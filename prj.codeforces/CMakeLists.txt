@@ -1,0 +1,5 @@
+add_executable(0550c 0550c.cpp)
+add_executable(0569a 0569a.cpp)
+add_executable(0706b 0706b.cpp)
+add_executable(1409d 1409d.cpp)
+add_executable(1490c 1490c.cpp)
