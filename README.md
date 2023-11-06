@@ -18,7 +18,7 @@
 
 ## Макет интерфейса 
 
-[Image alt](https://github.com/LLrodyaLL/misis2023f-22-01-nurgaliev-r-d/blob/main/demo_file_opening.png)
+![Image alt](https://github.com/LLrodyaLL/misis2023f-22-01-nurgaliev-r-d/blob/main/demo_file_opening.png)
 
-[Image alt](https://github.com/LLrodyaLL/misis2023f-22-01-nurgaliev-r-d/blob/main/demo_file_opening_1.jpg)
+![Image alt](https://github.com/LLrodyaLL/misis2023f-22-01-nurgaliev-r-d/blob/main/demo_file_opening_1.jpg)
 
