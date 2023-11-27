@@ -22,50 +22,62 @@ static void glfw_error_callback(int error, const char* description)
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
-bool showButtons = false;
-bool showSubButtons = false;
 
-std::string exportImagePath;
-cv::Mat exportImage;
+GLuint textureID;
 
-// Функция для загрузки изображения по указанному пути
-void LoadExportImage(const std::string& imagePath) {
-    exportImage = cv::imread(imagePath, cv::IMREAD_UNCHANGED);
-    if (exportImage.empty()) {
-        // Вывести информацию об ошибке загрузки
-        std::cerr << "Error loading image from path: " << imagePath << std::endl;
-        const char* errorMessage = "Unable to load image. Check if the file exists and is a valid image format.";
-        ImGui::OpenPopup("Error");
-        ImGui::SetNextWindowSize(ImVec2(400, 100));
-        if (ImGui::BeginPopupModal("Error", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGui::Text("%s", errorMessage);
-            if (ImGui::Button("OK", ImVec2(120, 0))) {
-                ImGui::CloseCurrentPopup();
-            }
-            ImGui::EndPopup();
+GLuint loadTexture(const cv::Mat& image) {
+
+
+    glGenTextures(1, &textureID);
+
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.cols, image.rows, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    return textureID;
+}
+
+
+bool isImageOpened = false;
+cv::Mat firstImage;
+
+
+// Функция открытия и загрузки изображения
+void openImage() {
+
+    nfdchar_t* outPath = nullptr;
+    nfdresult_t result = NFD_OpenDialog(nullptr, nullptr, &outPath);
+    if (result == NFD_OKAY) {
+        cv::Mat Image = cv::imread(outPath);
+
+        if (Image.empty()) { std::cout << "open image error" << std::endl; }
+        else {
+            std::cout << "Image loaded successfully from path: " << outPath << std::endl;
+            isImageOpened = true;
+
+            cv::cvtColor(Image, Image, cv::COLOR_BGR2RGBA);
+
+            firstImage = Image;
+
+            GLuint textureID = loadTexture(Image);
+
         }
+
     }
     else {
-        exportImagePath = imagePath;
-        // Вывести информацию об успешной загрузке
-        std::cout << "Image loaded successfully from path: " << imagePath << std::endl;
+        std::cout << "nfd error" << std::endl;
     }
 }
 
-// Функция для обработки нажатия кнопки "Export"
-void HandleExportButton() {
+// Функция для обработки нажатия кнопки "save"
+void savePoints() {
     nfdchar_t* outPath = NULL;
-    nfdresult_t result = NFD_SaveDialog("jpg,png", NULL, &outPath);
+    nfdresult_t result = NFD_SaveDialog("txt", NULL, &outPath);
 
     if (result == NFD_OKAY) {
-        if (!exportImage.empty()) {
-            cv::imread(outPath);
-            LoadExportImage(outPath);
-        }
-        else {
-            puts("Trying to save an empty Image.");
-        }
-        free(outPath);
+        // TODO: тут будет сохранение точек
     }
     else if (result == NFD_CANCEL) {
         puts("User pressed cancel.");
@@ -75,6 +87,10 @@ void HandleExportButton() {
         printf("Error: %s\n", NFD_GetError());
         free(outPath);
     }
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    //Реализовать код масштабирования с помощью колёсика мыши
 }
 
 int main(int, char**)
@@ -150,19 +166,20 @@ int main(int, char**)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        {
-            ImGui::SetNextWindowPos(ImVec2(0, 0));
-            ImGui::Begin("Settings");
 
-            if (ImGui::Button("Files", ImVec2(160, 30))) {
-                showButtons = !showButtons;
-            }
-
-            if (showButtons) {
-                if (ImGui::Button("Import a set of points", ImVec2(160, 30))) {
+        if (ImGui::BeginMainMenuBar()) {
+            if (ImGui::BeginMenu("File")) {
+                if (ImGui::MenuItem("Open Image 1")) {
+                    //Функция открытия первой картинки
+                    openImage();
+                };
+                if (ImGui::MenuItem("Open Image 2")) {
+                    //Функция открытия второй картинки
+                };
+                if (ImGui::MenuItem("Import a set of points", "CTRL+O", false, true)) {
+                    //a
                     nfdchar_t* outPath = NULL;
                     nfdresult_t result = NFD_OpenDialog(NULL, NULL, &outPath);
-
 
                     if (result == NFD_OKAY) {
                         puts("Success!");
@@ -175,18 +192,24 @@ int main(int, char**)
                     else {
                         printf("Error: %s\n", NFD_GetError());
                     }
+
+                }
+                ImGui::Separator();
+                if (ImGui::MenuItem("Save", "CTRL+S", false, true)) {
+                    //a
+                    savePoints();
                 }
 
-                if (ImGui::Button("Export", ImVec2(160, 30))) {
-                    HandleExportButton();
+                ImGui::Separator();
+                if (ImGui::MenuItem("Quit")) {
+                    //Фунуция для выхода
                 }
-
-                if (ImGui::Button("Close", ImVec2(160, 30))) {
-                    showButtons = false;
-                }
+                ImGui::EndMenu();
             }
+            ImGui::EndMainMenuBar();
+        }
 
-            ImGui::End();
+        {
 
             ImGui::SetNextWindowPos(ImVec2(100, 300));
             ImGui::SetNextWindowSize(ImVec2(500, 500));
@@ -201,17 +224,24 @@ int main(int, char**)
             ImVec2 windowPos_1 = ImGui::GetWindowPos();
             ImVec2 textSize_1 = ImGui::CalcTextSize("Window 1");
 
+            if (isImageOpened) {
+                ImGui::Image((void*)(intptr_t)textureID, ImVec2(firstImage.cols, firstImage.rows));
+            }
+
+
+
+
             float posX_1 = windowPos_1.x + (windowSize_1.x - textSize_1.x) * 0.5f;
             float posY_1 = windowPos_1.y + (windowSize_1.y - textSize_1.y) * 0.5f;
 
-            if (!exportImagePath.empty() && !exportImage.empty()) {
-                GLuint textureID = 0;
-                glGenTextures(1, &textureID);
-                glBindTexture(GL_TEXTURE_2D, textureID);
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, exportImage.cols, exportImage.rows, 0, GL_RGBA, GL_UNSIGNED_BYTE, exportImage.ptr());
-                ImGui::Image((void*)(intptr_t)textureID, ImVec2(exportImage.cols, exportImage.rows));
-                glDeleteTextures(1, &textureID);
-            }
+            //            if (!exportImagePath.empty() && !exportImage.empty()) {
+            //                GLuint textureID = 0;
+            //                glGenTextures(1, &textureID);
+            //                glBindTexture(GL_TEXTURE_2D, textureID);
+            //                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, exportImage.cols, exportImage.rows, 0, GL_RGBA, GL_UNSIGNED_BYTE, exportImage.ptr());
+            //                ImGui::Image((void*)(intptr_t)textureID, ImVec2(exportImage.cols, exportImage.rows));
+            //                glDeleteTextures(1, &textureID);
+            //            }
 
             ImGui::End();
             ImGui::PopStyleVar();
@@ -269,7 +299,7 @@ int main(int, char**)
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
-        glClearColor(clear_color.x* clear_color.w, clear_color.y* clear_color.w, clear_color.z* clear_color.w, clear_color.w);
+        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -290,4 +320,3 @@ int main(int, char**)
 
     return 0;
 }
-
