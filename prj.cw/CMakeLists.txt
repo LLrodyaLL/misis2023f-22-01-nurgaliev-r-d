@@ -8,12 +8,15 @@ project ("AstMarker")
 find_package(imgui CONFIG REQUIRED)
 find_package(unofficial-nativefiledialog CONFIG REQUIRED)
 find_package(OpenCV CONFIG REQUIRED)
+find_package(glad CONFIG REQUIRED)
 
 # Добавьте источник в исполняемый файл этого проекта.
 add_executable (AstMarker "AstMarker.cpp" "AstMarker.h")
 target_link_libraries(AstMarker PRIVATE imgui::imgui)
 target_link_libraries(AstMarker PRIVATE unofficial::nativefiledialog::nfd)
 target_link_libraries(AstMarker PRIVATE ${OpenCV_LIBS})
+target_link_libraries(AstMarker PRIVATE glad::glad)
+
 
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
