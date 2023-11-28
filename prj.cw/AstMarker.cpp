@@ -45,23 +45,49 @@ cv::Mat firstImage;
 
 
 // Функция открытия и загрузки изображения
-void openImage() {
+void openImage_1() {
 
-    nfdchar_t* outPath = nullptr;
-    nfdresult_t result = NFD_OpenDialog(nullptr, nullptr, &outPath);
-    if (result == NFD_OKAY) {
-        cv::Mat Image = cv::imread(outPath);
+    nfdchar_t* outPath_1 = nullptr;
+    nfdresult_t result_1 = NFD_OpenDialog(nullptr, nullptr, &outPath_1);
+    if (result_1 == NFD_OKAY) {
+        cv::Mat Image_1 = cv::imread(outPath_1);
 
-        if (Image.empty()) { std::cout << "open image error" << std::endl; }
+        if (Image_1.empty()) { std::cout << "open image error" << std::endl; }
         else {
-            std::cout << "Image loaded successfully from path: " << outPath << std::endl;
+            std::cout << "Image loaded successfully from path: " << outPath_1 << std::endl;
             isImageOpened = true;
 
-            cv::cvtColor(Image, Image, cv::COLOR_BGR2RGBA);
+            cv::cvtColor(Image_1, Image_1, cv::COLOR_BGR2RGBA);
 
-            firstImage = Image;
+            firstImage = Image_1;
 
-            GLuint textureID = loadTexture(Image);
+            GLuint textureID = loadTexture(Image_1);
+
+        }
+
+    }
+    else {
+        std::cout << "nfd error" << std::endl;
+    }
+}
+
+void openImage_2() {
+
+    nfdchar_t* outPath_2 = nullptr;
+    nfdresult_t result_2 = NFD_OpenDialog(nullptr, nullptr, &outPath_2);
+    if (result_2 == NFD_OKAY) {
+        cv::Mat Image_2 = cv::imread(outPath_2);
+
+        if (Image_2.empty()) { std::cout << "open image error" << std::endl; }
+        else {
+            std::cout << "Image loaded successfully from path: " << outPath_2 << std::endl;
+            isImageOpened = true;
+
+            cv::cvtColor(Image_2, Image_2, cv::COLOR_BGR2RGBA);
+
+            firstImage = Image_2;
+
+            GLuint textureID = loadTexture(Image_2);
 
         }
 
@@ -89,8 +115,22 @@ void savePoints() {
     }
 }
 
+// Глобальные переменные для управления масштабированием
+float scale = 1.0f;
+float scrollSensitivity = 0.1f;
+
+
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-    //Реализовать код масштабирования с помощью колёсика мыши
+    // Обработка событий колеса мыши
+    if (yoffset > 0) {
+        // Увеличение масштаба при прокрутке вверх
+        scale += scrollSensitivity;
+    }
+    else if (yoffset < 0) {
+        // Уменьшение масштаба при прокрутке вниз
+        scale -= scrollSensitivity;
+        scale = std::max(scale, 0.1f); // Минимальный масштаб
+    }
 }
 
 int main(int, char**)
@@ -156,6 +196,9 @@ int main(int, char**)
     io.IniFilename = nullptr;
     EMSCRIPTEN_MAINLOOP_BEGIN
 #else
+
+    glfwSetScrollCallback(window, scroll_callback);
+
     while (!glfwWindowShouldClose(window))
 #endif
     {
@@ -171,10 +214,11 @@ int main(int, char**)
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Open Image 1")) {
                     //Функция открытия первой картинки
-                    openImage();
+                    openImage_1();
                 };
                 if (ImGui::MenuItem("Open Image 2")) {
                     //Функция открытия второй картинки
+                    openImage_2();
                 };
                 if (ImGui::MenuItem("Import a set of points", "CTRL+O", false, true)) {
                     //a
@@ -225,7 +269,7 @@ int main(int, char**)
             ImVec2 textSize_1 = ImGui::CalcTextSize("Window 1");
 
             if (isImageOpened) {
-                ImGui::Image((void*)(intptr_t)textureID, ImVec2(firstImage.cols, firstImage.rows));
+                ImGui::Image((void*)(intptr_t)textureID, ImVec2(firstImage.cols * scale, firstImage.rows * scale));
             }
 
 
@@ -263,8 +307,6 @@ int main(int, char**)
             float posX_2 = windowPos_2.x + (windowSize_2.x - textSize_2.x) * 0.5f;
             float posY_2 = windowPos_2.y + (windowSize_2.y - textSize_2.y) * 0.5f;
 
-            ImDrawList* drawList_2 = ImGui::GetWindowDrawList();
-            drawList_2->AddText(ImVec2(posX_2, posY_2), ImGui::GetColorU32(ImGuiCol_Text), "Window 2");
 
             ImGui::End();
             ImGui::PopStyleVar();
