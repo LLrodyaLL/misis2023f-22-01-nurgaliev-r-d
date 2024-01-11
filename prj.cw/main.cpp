@@ -21,12 +21,19 @@ struct App {
 
     sf::Vector2f firstCursor1Pos;
     sf::Vector2f firstCursor2Pos;
+    sf::Vector2f firstCursor3Pos;
+    sf::Vector2f firstCursor4Pos;
 
     sf::Vector2f secondCursor1Pos;
     sf::Vector2f secondCursor2Pos;
+    sf::Vector2f secondCursor3Pos;
+    sf::Vector2f secondCursor4Pos;
 
     sf::Vector2f thirdCursor1Pos;
     sf::Vector2f thirdCursor2Pos;
+    sf::Vector2f thirdCursor3Pos;
+    sf::Vector2f thirdCursor4Pos;
+
 
 
     float firstZoom;
@@ -59,6 +66,7 @@ struct App {
             cursorPos.y = static_cast<float>(window.getSize().y);
         }
     }
+
 
     App() : window(sf::VideoMode(1600, 800), "AstMarker"), firstZoom(1.0f), secondZoom(1.0f), thirdZoom(1.0f), activeImage(0) {
 
@@ -131,6 +139,8 @@ struct App {
                 // Применение масштабирования с учетом позиции курсора
                 getActiveImage().sprite.setScale(getActiveZoom(), getActiveZoom());
                 translate = anchorPoint - (anchorPoint - translate) * (getActiveZoom() / oldZoom);
+                
+
 
                 updateOtherImagesZoom();
 
@@ -145,39 +155,46 @@ struct App {
 
                 firstCursorPos = mousePosFloat;
                 secondCursorPos = mousePosFloat - sf::Vector2f(window.getSize().x / 3.0f, 0);
-                thirdCursorPos = mousePosFloat - sf::Vector2f(window.getSize().x * 2.0f / 3.0f, 0);
+                thirdCursorPos = mousePosFloat - sf::Vector2f(window.getSize().x / 3.0f * 2.0f, 0);
 
-              
-                sf::Vector2f localCursorPos2 = secondIm.sprite.getInverseTransform().transformPoint(secondCursorPos);
-                secondIm.cursor1_1.setPosition(localCursorPos2.x - 6.6, localCursorPos2.y);
-                secondIm.cursor1_2.setPosition(localCursorPos2.x, localCursorPos2.y - 6.6);
-
-                sf::Vector2f localCursorPos3 = thirdIm.sprite.getInverseTransform().transformPoint(thirdCursorPos);
-                thirdIm.cursor1_1.setPosition(localCursorPos3.x - 6.6, localCursorPos3.y);
-                thirdIm.cursor1_2.setPosition(localCursorPos3.x, localCursorPos3.y - 6.6);
 
                 firstCursor1Pos = sf::Vector2f(firstCursorPos.x - 6.6, firstCursorPos.y);
                 firstCursor2Pos = sf::Vector2f(firstCursorPos.x, firstCursorPos.y - 6.6);
 
+                firstCursor3Pos = sf::Vector2f(firstCursorPos.x - 6.6 - window.getSize().x / 3.0f, firstCursorPos.y);
+                firstCursor4Pos = sf::Vector2f(firstCursorPos.x - window.getSize().x / 3.0f, firstCursorPos.y - 6.6);
+
                 secondCursor1Pos = sf::Vector2f(secondCursorPos.x - 6.6, secondCursorPos.y);
                 secondCursor2Pos = sf::Vector2f(secondCursorPos.x, secondCursorPos.y - 6.6);
 
-                
+                secondCursor3Pos = sf::Vector2f(secondCursorPos.x - 6.6 + window.getSize().x, secondCursorPos.y);
+                secondCursor4Pos = sf::Vector2f(secondCursorPos.x + window.getSize().x, secondCursorPos.y - 6.6);
+
+                thirdCursor1Pos = sf::Vector2f(thirdCursorPos.x - 6.6, thirdCursorPos.y);
+                thirdCursor2Pos = sf::Vector2f(thirdCursorPos.x, thirdCursorPos.y - 6.6);
+
+                thirdCursor3Pos = sf::Vector2f(thirdCursorPos.x - 6.6 + window.getSize().x, thirdCursorPos.y);
+                thirdCursor4Pos = sf::Vector2f(thirdCursorPos.x + window.getSize().x, thirdCursorPos.y - 6.6);
+
+
                 // Проверка и коррекция границ курсоров
                 constrainCursorToBounds(firstCursorPos, firstIm);
                 constrainCursorToBounds(secondCursorPos, secondIm);
                 constrainCursorToBounds(thirdCursorPos, thirdIm);
 
-                             
-              
-                if (mousePos.x > window.getSize().x / 3 && mousePos.x < window.getSize().x / 3 * 2) {
-                    secondCursorPos.x = mousePosFloat.x - window.getSize().x / 3;
-                    secondCursorPos.y = mousePosFloat.y;
+                sf::Vector2f localCursorPos1 = secondIm.sprite.getInverseTransform().transformPoint(firstCursorPos);
+                firstIm.cursor1_1.setPosition(localCursorPos1.x - 6.6, localCursorPos1.y);
+                firstIm.cursor1_2.setPosition(localCursorPos1.x, localCursorPos1.y - 6.6);
 
-                    sf::Vector2f localCursorPos = secondIm.sprite.getInverseTransform().transformPoint(secondCursorPos);
-                    secondIm.cursor1_1.setPosition(localCursorPos.x - 6.6, localCursorPos.y);
-                    secondIm.cursor1_2.setPosition(localCursorPos.x, localCursorPos.y - 6.6);
-                }
+                sf::Vector2f localCursorPos2 = secondIm.sprite.getInverseTransform().transformPoint(secondCursorPos);
+                secondIm.cursor2_1.setPosition(localCursorPos2.x - 6.6, localCursorPos2.y);
+                secondIm.cursor2_2.setPosition(localCursorPos2.x, localCursorPos2.y - 6.6);
+
+                sf::Vector2f localCursorPos3 = thirdIm.sprite.getInverseTransform().transformPoint(thirdCursorPos);
+                thirdIm.cursor3_1.setPosition(localCursorPos3.x - 6.6, localCursorPos3.y);
+                thirdIm.cursor3_2.setPosition(localCursorPos3.x, localCursorPos3.y - 6.6);
+
+              
 
                 if ((mousePos.x < window.getSize().x / 3) and firstIm.is_opened and secondIm.is_opened) {
                     bool loopCompleted = true;
@@ -316,7 +333,7 @@ struct App {
 
     void update() {
         ImGui::SFML::Update(window, sf::seconds(1.0f / 60.0f));
-        //ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("File")) {
@@ -340,7 +357,7 @@ struct App {
             ImGui::SetWindowPos(ImVec2(0.0f, window.getSize().y - 30.0f));
             ImGui::SetWindowSize(ImVec2(window.getSize().x, 30.0f));
 
-            ImGui::Columns(6);
+            ImGui::Columns(4);
             ImGui::Text("win size: %d %d", window.getSize().x, window.getSize().y);
             ImGui::NextColumn();
             ImGui::Text("translate: %f %f", translate.x, translate.y);
@@ -348,13 +365,10 @@ struct App {
             ImGui::Text("zoom: %f", secondZoom);
             ImGui::NextColumn();
             ImGui::Text("mouse: %d %d", sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y);
-            ImGui::NextColumn();
-            ImGui::Text("1 hoverID: %d", firstIm.hoveredCircleIndex);
-            ImGui::NextColumn();
-            ImGui::Text("2 hoverID: %d", secondIm.hoveredCircleIndex);
+            
         }
         ImGui::End();
-        //ImGui::PopStyleColor();
+        ImGui::PopStyleColor();
 
     }
 
@@ -389,18 +403,14 @@ struct App {
                 firstIm.internalTexture.draw(tempCircle);
             }
 
-            sf::RectangleShape cursor1_1(sf::Vector2f(18, 5));
-            cursor1_1.setFillColor(sf::Color::Green);
-            cursor1_1.setPosition(firstCursor1Pos);
-            window.draw(cursor1_1);
+            
 
-            sf::RectangleShape cursor1_2(sf::Vector2f(5, 18));
-            cursor1_2.setFillColor(sf::Color::Green);
-            cursor1_2.setPosition(firstCursor2Pos);
-            window.draw(cursor1_2);
 
             firstIm.internalTexture.display();
             window.draw(internalSprite);
+
+           
+
         }
         ImGui::End();
 
@@ -425,20 +435,12 @@ struct App {
                 secondIm.internalTexture.draw(tempCircle);
             }
 
-            sf::RectangleShape cursor2_1(sf::Vector2f(18, 5));
-            cursor2_1.setFillColor(sf::Color::Green);
-            cursor2_1.setPosition(secondCursor1Pos);
-            constrainCursorToBounds(secondCursorPos, secondIm);
-            window.draw(cursor2_1);
-
-            sf::RectangleShape cursor2_2(sf::Vector2f(5, 18));
-            cursor2_2.setFillColor(sf::Color::Green);
-            cursor2_2.setPosition(secondCursor2Pos);
-            constrainCursorToBounds(secondCursorPos, secondIm);
-            window.draw(cursor2_2);
+            
 
             secondIm.internalTexture.display();
             window.draw(internalSprite);
+            
+            
         }
         ImGui::End();
 
@@ -454,20 +456,106 @@ struct App {
             thirdIm.sprite.setScale(thirdZoom, thirdZoom);
             thirdIm.internalTexture.draw(thirdIm.sprite);
 
+            
+
+            thirdIm.internalTexture.display();
+            window.draw(internalSprite);
+
+            sf::RectangleShape cursor1_1(sf::Vector2f(18, 5));
+            cursor1_1.setFillColor(sf::Color::Green);
+            cursor1_1.setPosition(firstCursor1Pos);
+            if (activeImage != 0) {
+                window.draw(cursor1_1);
+            }
+
+            sf::RectangleShape cursor1_2(sf::Vector2f(5, 18));
+            cursor1_2.setFillColor(sf::Color::Green);
+            cursor1_2.setPosition(firstCursor2Pos);
+            if (activeImage != 0) {
+                window.draw(cursor1_2);
+            }
+
+            sf::RectangleShape cursor1_3(sf::Vector2f(18, 5));
+            cursor1_3.setFillColor(sf::Color::Green);
+            cursor1_3.setPosition(firstCursor3Pos);
+            if (activeImage != 0) {
+                window.draw(cursor1_3);
+            }
+
+            sf::RectangleShape cursor1_4(sf::Vector2f(5, 18));
+            cursor1_4.setFillColor(sf::Color::Green);
+            cursor1_4.setPosition(firstCursor4Pos);
+            if (activeImage != 0) {
+                window.draw(cursor1_4);
+            }
+
+            sf::RectangleShape cursor2_1(sf::Vector2f(18, 5));
+            cursor2_1.setFillColor(sf::Color::Green);
+            cursor2_1.setPosition(secondCursor1Pos);
+            constrainCursorToBounds(secondCursorPos, secondIm);
+            if (activeImage != 1) {
+                window.draw(cursor2_1);
+            }
+
+            sf::RectangleShape cursor2_2(sf::Vector2f(5, 18));
+            cursor2_2.setFillColor(sf::Color::Green);
+            cursor2_2.setPosition(secondCursor2Pos);
+            constrainCursorToBounds(secondCursorPos, secondIm);
+            if (activeImage != 1) {
+                window.draw(cursor2_2);
+            }
+
+            sf::RectangleShape cursor2_3(sf::Vector2f(18, 5));
+            cursor2_3.setFillColor(sf::Color::Green);
+            cursor2_3.setPosition(secondCursor3Pos);
+            constrainCursorToBounds(secondCursorPos, secondIm);
+            if (activeImage != 1) {
+                window.draw(cursor2_3);
+            }
+
+            sf::RectangleShape cursor2_4(sf::Vector2f(5, 18));
+            cursor2_4.setFillColor(sf::Color::Green);
+            cursor2_4.setPosition(secondCursor4Pos);
+            constrainCursorToBounds(secondCursorPos, secondIm);
+            if (activeImage != 1) {
+                window.draw(cursor2_4);
+            }
+
             sf::RectangleShape cursor3_1(sf::Vector2f(18, 5));
             cursor3_1.setFillColor(sf::Color::Green);
             cursor3_1.setPosition(thirdCursor1Pos);
             constrainCursorToBounds(thirdCursorPos, thirdIm);
-            window.draw(cursor3_1);
+            if (activeImage != 2) {
+                window.draw(cursor3_1);
+            }
 
             sf::RectangleShape cursor3_2(sf::Vector2f(5, 18));
             cursor3_2.setFillColor(sf::Color::Green);
             cursor3_2.setPosition(thirdCursor2Pos);
             constrainCursorToBounds(thirdCursorPos, thirdIm);
-            window.draw(cursor3_2);
+            if (activeImage != 2) {
+                window.draw(cursor3_2);
+            }
 
-            thirdIm.internalTexture.display();
-            window.draw(internalSprite);
+            sf::RectangleShape cursor3_3(sf::Vector2f(18, 5));
+            cursor3_3.setFillColor(sf::Color::Green);
+            cursor3_3.setPosition(thirdCursor3Pos);
+            constrainCursorToBounds(thirdCursorPos, thirdIm);
+            if (activeImage != 2) {
+                window.draw(cursor3_3);
+            }
+
+            sf::RectangleShape cursor3_4(sf::Vector2f(5, 18));
+            cursor3_4.setFillColor(sf::Color::Green);
+            cursor3_4.setPosition(thirdCursor4Pos);
+            constrainCursorToBounds(thirdCursorPos, thirdIm);
+            if (activeImage != 2) {
+                window.draw(cursor3_4);
+            }
+
+           
+
+            
         }
         ImGui::End();
 
