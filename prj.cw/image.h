@@ -19,6 +19,10 @@ public:
 
     sf::RectangleShape cursor1_1;  
     sf::RectangleShape cursor1_2;
+    sf::RectangleShape cursor2_1;
+    sf::RectangleShape cursor2_2;
+    sf::RectangleShape cursor3_1;
+    sf::RectangleShape cursor3_2;
 
 };
 #endif //ASTMARKER_IMAGE_H
