@@ -4,44 +4,51 @@
 #include <iostream>
 #include "image.h"
 
-
+/**
+ * @struct App
+ * @brief Структура приложения, управляющая основным окном и обрабатывающая ввод пользователя.
+ */
 struct App {
-    sf::RenderWindow window;
+    sf::RenderWindow window; /**< Окно приложения. */
 
-    sf::Vector2f translate;
-    sf::Vector2f mouseCoord;
+    sf::Vector2f translate; /**< Вектор смещения. */
+    sf::Vector2f mouseCoord; /**< Координаты мыши. */
 
-    Image firstIm;
-    Image secondIm;
-    Image thirdIm;
+    Image firstIm; /**< Первое изображение. */
+    Image secondIm; /**< Второе изображение. */
+    Image thirdIm; /**< Третье изображение. */
 
-    sf::Vector2f firstCursorPos;
-    sf::Vector2f secondCursorPos;
-    sf::Vector2f thirdCursorPos;
+    sf::Vector2f firstCursorPos; /**< Позиция первого курсора. */
+    sf::Vector2f secondCursorPos; /**< Позиция второго курсора. */
+    sf::Vector2f thirdCursorPos; /**< Позиция третьего курсора. */
 
-    sf::Vector2f firstCursor1Pos;
-    sf::Vector2f firstCursor2Pos;
-    sf::Vector2f firstCursor3Pos;
-    sf::Vector2f firstCursor4Pos;
+    sf::Vector2f firstCursor1Pos; /**< Позиция первого курсора, точка 1. */
+    sf::Vector2f firstCursor2Pos; /**< Позиция первого курсора, точка 2. */
+    sf::Vector2f firstCursor3Pos; /**< Позиция первого курсора, точка 3. */
+    sf::Vector2f firstCursor4Pos; /**< Позиция первого курсора, точка 4. */
 
-    sf::Vector2f secondCursor1Pos;
-    sf::Vector2f secondCursor2Pos;
-    sf::Vector2f secondCursor3Pos;
-    sf::Vector2f secondCursor4Pos;
+    sf::Vector2f secondCursor1Pos; /**< Позиция второго курсора, точка 1. */
+    sf::Vector2f secondCursor2Pos; /**< Позиция второго курсора, точка 2. */
+    sf::Vector2f secondCursor3Pos; /**< Позиция второго курсора, точка 3. */
+    sf::Vector2f secondCursor4Pos; /**< Позиция второго курсора, точка 4. */
 
-    sf::Vector2f thirdCursor1Pos;
-    sf::Vector2f thirdCursor2Pos;
-    sf::Vector2f thirdCursor3Pos;
-    sf::Vector2f thirdCursor4Pos;
+    sf::Vector2f thirdCursor1Pos; /**< Позиция третьего курсора, точка 1. */
+    sf::Vector2f thirdCursor2Pos; /**< Позиция третьего курсора, точка 2. */
+    sf::Vector2f thirdCursor3Pos; /**< Позиция третьего курсора, точка 3. */
+    sf::Vector2f thirdCursor4Pos; /**< Позиция третьего курсора, точка 4. */
+
+    sf::BlendMode overlayBlendMode; /**< Режим наложения для изображений. */
+
+    float firstZoom; /**< Уровень масштабирования для первого изображения. */
+    float secondZoom; /**< Уровень масштабирования для второго изображения. */
+    float thirdZoom; /**< Уровень масштабирования для третьего изображения. */
+
+    int activeImage; /**< Индекс активного изображения. */
 
 
-
-    float firstZoom;
-    float secondZoom;
-    float thirdZoom;
-
-    int activeImage;
-
+    /**
+     * @brief Обновляет уровень масштабирования других изображений, соответствуя активному изображению.
+     */
     void updateOtherImagesZoom() {
         float activeZoom = getActiveZoom();
         
@@ -50,6 +57,12 @@ struct App {
         thirdZoom = activeZoom;
     }
 
+
+    /**
+     * @brief Ограничивает позицию курсора в пределах изображения.
+     * @param cursorPos Позиция курсора, которую нужно ограничить.
+     * @param image Изображение, для которого ограничивается позиция курсора.
+     */
     void constrainCursorToBounds(sf::Vector2f& cursorPos, const Image& image) {
         // Проверка и коррекция границ курсора внутри спрайта
         if (cursorPos.x < 0) {
@@ -68,6 +81,55 @@ struct App {
     }
 
 
+    /**
+     * @brief Накладывает первое изображение на второе и сохраняет результат в третьем изображении.
+     * @param image1 Первое изображение.
+     * @param image2 Второе изображение.
+     * @param resultImage Результирующее изображение после наложения.
+     */
+    void overlayImage(const Image& image1, const Image& image2, Image& resultImage) {
+
+        const sf::Texture& texture1 = image1.internalTexture.getTexture();
+        const sf::Texture& texture2 = image2.internalTexture.getTexture();
+
+        // Создание спрайтов для изображений
+        sf::Sprite sprite1(texture1);
+        sf::Sprite sprite2(texture2);
+
+        // Получение размеров изображений
+        sf::Vector2u imageSize1 = texture1.getSize();
+        sf::Vector2u imageSize2 = texture2.getSize();
+
+        // Определение размера результирующего изображения
+        unsigned int resultWidth = std::max(imageSize1.x, imageSize2.x);
+        unsigned int resultHeight = std::max(imageSize1.y, imageSize2.y);
+
+        resultImage.internalTexture.create(resultWidth, resultHeight);
+
+        resultImage.internalTexture.clear(sf::Color(0, 0, 0, 0));
+
+        sf::RenderTexture renderTexture;
+        renderTexture.create(resultWidth, resultHeight);
+
+        renderTexture.clear(sf::Color::Transparent);
+        renderTexture.draw(sprite1);
+
+        sf::RenderStates states;
+        states.blendMode = sf::BlendMultiply;  
+        renderTexture.draw(sprite2, states);
+
+        renderTexture.display();
+
+        sf::Texture resultTexture = renderTexture.getTexture();
+        resultImage.internalTexture.draw(sf::Sprite(resultTexture));
+        
+        resultImage.internalTexture.display();
+    }
+
+
+    /**
+    * @brief Конструктор по умолчанию для структуры App.
+    */
     App() : window(sf::VideoMode(1600, 800), "AstMarker"), firstZoom(1.0f), secondZoom(1.0f), thirdZoom(1.0f), activeImage(0) {
 
         firstIm.internalTexture.create(window.getSize().x / 3, window.getSize().y);
@@ -80,8 +142,14 @@ struct App {
         thirdCursorPos = sf::Vector2f(window.getSize().x * 5 / 6, window.getSize().y / 2);
 
 
+        overlayBlendMode = sf::BlendMode(sf::BlendMode::Factor::SrcAlpha, sf::BlendMode::Factor::OneMinusSrcAlpha, sf::BlendMode::Equation::Add,
+            sf::BlendMode::Factor::One, sf::BlendMode::Factor::OneMinusSrcAlpha, sf::BlendMode::Equation::Add);
     }
 
+
+    /**
+    * @brief Обрабатывает события ввода пользователя.
+    */
     void handleInput() {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -102,7 +170,6 @@ struct App {
 
                 sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-                // Определение активного изображения
                 if (mousePosition.x < window.getSize().x / 3) {
                     activeImage = 0;
                 }
@@ -114,6 +181,7 @@ struct App {
                 }
 
                 auto oldZoom = getActiveZoom();
+
                 // Масштабирование колесиком мыши
                 if (event.mouseWheelScroll.delta > 0) {
                     setActiveZoom(getActiveZoom() * 1.1f);
@@ -140,7 +208,6 @@ struct App {
                 getActiveImage().sprite.setScale(getActiveZoom(), getActiveZoom());
                 translate = anchorPoint - (anchorPoint - translate) * (getActiveZoom() / oldZoom);
                 
-
 
                 updateOtherImagesZoom();
 
@@ -182,113 +249,44 @@ struct App {
                 constrainCursorToBounds(secondCursorPos, secondIm);
                 constrainCursorToBounds(thirdCursorPos, thirdIm);
 
-                sf::Vector2f localCursorPos1 = secondIm.sprite.getInverseTransform().transformPoint(firstCursorPos);
+                sf::Vector2f localCursorPos1 = firstIm.sprite.getInverseTransform().transformPoint(firstCursorPos);
                 firstIm.cursor1_1.setPosition(localCursorPos1.x - 6.6, localCursorPos1.y);
                 firstIm.cursor1_2.setPosition(localCursorPos1.x, localCursorPos1.y - 6.6);
+                firstIm.cursor1_3.setPosition(localCursorPos1.x - 6.6 - window.getSize().x / 3.0f, localCursorPos1.y);
+                firstIm.cursor1_4.setPosition(localCursorPos1.x - window.getSize().x / 3.0f, localCursorPos1.y - 6.6);
 
                 sf::Vector2f localCursorPos2 = secondIm.sprite.getInverseTransform().transformPoint(secondCursorPos);
                 secondIm.cursor2_1.setPosition(localCursorPos2.x - 6.6, localCursorPos2.y);
                 secondIm.cursor2_2.setPosition(localCursorPos2.x, localCursorPos2.y - 6.6);
+                secondIm.cursor2_3.setPosition(localCursorPos2.x - 6.6 + window.getSize().x, localCursorPos2.y);
+                secondIm.cursor2_4.setPosition(localCursorPos2.x + window.getSize().x, localCursorPos2.y - 6.6);
 
                 sf::Vector2f localCursorPos3 = thirdIm.sprite.getInverseTransform().transformPoint(thirdCursorPos);
                 thirdIm.cursor3_1.setPosition(localCursorPos3.x - 6.6, localCursorPos3.y);
                 thirdIm.cursor3_2.setPosition(localCursorPos3.x, localCursorPos3.y - 6.6);
+                thirdIm.cursor3_3.setPosition(localCursorPos3.x - 6.6 + window.getSize().x, localCursorPos3.y);
+                thirdIm.cursor3_4.setPosition(localCursorPos3.x + window.getSize().x, localCursorPos3.y - 6.6);
 
-              
-
-                if ((mousePos.x < window.getSize().x / 3) and firstIm.is_opened and secondIm.is_opened) {
-                    bool loopCompleted = true;
-                    for (std::size_t i = 0; i < firstIm.drawPoints.size(); ++i) {
-                        sf::Rect pointBounds = firstIm.drawPoints[i].getGlobalBounds();
-                        sf::Vector2f pointSize(firstIm.sprite.getTransform().transformPoint(pointBounds.left, pointBounds.top));
-                        pointBounds.left = pointSize.x;
-                        pointBounds.top = pointSize.y;
-                        if (pointBounds.contains(mousePosFloat)) {
-                            firstIm.hoveredCircleIndex = static_cast<int>(i);
-                            loopCompleted = false;
-                            break;
-                        }
-                    }
-                    if (loopCompleted) { firstIm.hoveredCircleIndex = -1; }
-                }
-                if (mousePos.x > window.getSize().x / 3 and mousePos.x < window.getSize().x / 3 * 2 and secondIm.is_opened) {
-                    bool loopCompleted = true;
-                    for (std::size_t i = 0; i < secondIm.drawPoints.size(); ++i) {
-                        sf::Rect pointBounds = secondIm.drawPoints[i].getGlobalBounds();
-                        sf::Vector2f pointSize(secondIm.sprite.getTransform().transformPoint(pointBounds.left, pointBounds.top));
-                        pointBounds.left = pointSize.x;
-                        pointBounds.top = pointSize.y;
-                        if (pointBounds.contains(mousePosFloat4Second)) {
-                            secondIm.hoveredCircleIndex = static_cast<int>(i);
-                            loopCompleted = false;
-                            break;
-                        }
-                    }
-                    if (loopCompleted) { secondIm.hoveredCircleIndex = -1; }
-                }
-
-                if (firstIm.selectedCircleIndex != -1) {
-                    firstIm.drawPoints[firstIm.selectedCircleIndex].setPosition(firstIm.sprite.getInverseTransform().transformPoint(mousePosFloat));
-
-                }
-                if (secondIm.selectedCircleIndex != -1) {
-                    secondIm.drawPoints[secondIm.selectedCircleIndex].setPosition(secondIm.sprite.getInverseTransform().transformPoint(mousePosFloat4Second));
-                }
+               
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
                     translate += newCoord - mouseCoord;
                 }
                 mouseCoord = newCoord;
 
-                
-
-                
             }
             else if (event.type == sf::Event::MouseButtonPressed) {
                 sf::Vector2i mousePos = sf::Mouse::getPosition(window);
                 sf::Vector2f mousePosFloat(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
-
-                if ((mousePos.x < window.getSize().x / 3) and firstIm.is_opened and secondIm.is_opened) {
-                    firstIm.selectedCircleIndex = firstIm.hoveredCircleIndex;
-                    if (firstIm.selectedCircleIndex == -1) {
-                        sf::CircleShape newCircle(10);
-                        newCircle.setFillColor(sf::Color::Red);
-                        newCircle.setPosition(firstIm.sprite.getInverseTransform().transformPoint(mousePosFloat));
-
-
-                        secondIm.predictPoint(newCircle.getPosition(), firstIm);
-
-
-                        firstIm.drawPoints.push_back(newCircle);
-                    }
-                }
-                else if (mousePos.x > window.getSize().x / 3 and mousePos.x < window.getSize().x / 3 * 2 and secondIm.is_opened) {
-                    mousePosFloat.x += -static_cast<float>(window.getSize().x) / 3.0f;
-                    secondIm.selectedCircleIndex = secondIm.hoveredCircleIndex;
-                    if (secondIm.selectedCircleIndex == -1) {
-                        sf::CircleShape newCircle(10);
-                        newCircle.setFillColor(sf::Color::Red);
-                        newCircle.setPosition(secondIm.sprite.getInverseTransform().transformPoint(mousePosFloat));
-                        firstIm.predictPoint(newCircle.getPosition(), secondIm);
-
-                        secondIm.drawPoints.push_back(newCircle);
-                        //
-                    }
-                }
-            }
-            else if (event.type == sf::Event::MouseButtonReleased) {
-                if (firstIm.selectedCircleIndex != -1 or secondIm.selectedCircleIndex != -1) {
-                    firstIm.selectedCircleIndex = -1;
-                    secondIm.selectedCircleIndex = -1;
-                    thirdIm.genWarpImg(firstIm, secondIm);
-                }
-                // Сбрасываем индекс выбранного круга при отпускании кнопки мыши
-//                firstIm.selectedCircleIndex = -1;
-//                secondIm.selectedCircleIndex = -1;
-
-            }
+               
+            }            
         }
     }
 
+
+    /**
+    * @brief Получает уровень масштабирования активного изображения.
+    * @return Уровень масштабирования активного изображения.
+    */
     float getActiveZoom() {
         switch (activeImage) {
         case 0:
@@ -302,6 +300,11 @@ struct App {
         }
     }
 
+
+    /**
+     * @brief Устанавливает уровень масштабирования активного изображения.
+     * @param zoom Уровень масштабирования для установки.
+     */
     void setActiveZoom(float zoom) {
         switch (activeImage) {
         case 0:
@@ -318,6 +321,11 @@ struct App {
         }
     }
 
+
+    /**
+     * @brief Получает ссылку на активное изображение.
+     * @return Ссылка на активное изображение.
+     */
     Image& getActiveImage() {
         switch (activeImage) {
         case 0:
@@ -327,10 +335,14 @@ struct App {
         case 2:
             return thirdIm;
         default:
-            return firstIm; // Default to firstIm if invalid activeImage
+            return firstIm; 
         }
     }
 
+
+    /**
+     * @brief Обновляет состояние приложения.
+     */
     void update() {
         ImGui::SFML::Update(window, sf::seconds(1.0f / 60.0f));
         ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -339,9 +351,12 @@ struct App {
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Open Image 1")) firstIm.openImage();
                 if (ImGui::MenuItem("Open Image 2")) secondIm.openImage();
-                if (ImGui::MenuItem("Import a set of points", "CTRL+O", false, true));
                 ImGui::Separator();
-                if (ImGui::MenuItem("Save", "CTRL+S", false, true));
+                if (ImGui::MenuItem("Import 1st Image points", nullptr, false, true));
+                if (ImGui::MenuItem("Import 2nd Image points", nullptr, false, true));
+                ImGui::Separator();
+                if (ImGui::MenuItem("Export 1st Image points", nullptr, false, true));
+                if (ImGui::MenuItem("Export 2nd Image points", nullptr, false, true));
                 ImGui::Separator();
                 if (ImGui::MenuItem("Quit")) {
                     //TODO: Фунуция для выхода из программы
@@ -372,13 +387,14 @@ struct App {
 
     }
 
+    /**
+     * @brief Отрисовывает приложение.
+     */
     void render() {
 
-        // Получение размеров экрана
         ImVec2 screenSize = ImGui::GetIO().DisplaySize;
-
-        // Вычисление новых размеров и позиций окон
-        ImVec2 windowSize = ImVec2(screenSize.x / 3, screenSize.y);
+                
+        ImVec2 windowSize = ImVec2(screenSize.x / 3, screenSize.y - 19 - 30);
         ImVec2 windowPos1 = ImVec2(0, 19);
         ImVec2 windowPos2 = ImVec2(screenSize.x / 3, 19);
         ImVec2 windowPos3 = ImVec2(2 * screenSize.x / 3, 19);
@@ -387,37 +403,27 @@ struct App {
 
         ImGui::SetNextWindowPos(windowPos1);
         ImGui::SetNextWindowSize(windowSize);
-        ImGui::Begin("FIRST WINDOW", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoCollapse);
+        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.9f, 0.9f, 1.0f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+        ImGui::Begin("FIRST WINDOW", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         if (firstIm.is_opened) {
             firstIm.internalTexture.clear();
             sf::Sprite internalSprite;
             internalSprite.setTexture(firstIm.internalTexture.getTexture());
             firstIm.sprite.setPosition(translate);
             firstIm.sprite.setScale(firstZoom, firstZoom);
+
             firstIm.internalTexture.draw(firstIm.sprite);
-
-            for (std::size_t i = 0; i < firstIm.drawPoints.size(); ++i) {
-                sf::CircleShape tempCircle = firstIm.drawPoints[i];
-                tempCircle.setPosition(firstIm.sprite.getTransform().transformPoint(firstIm.drawPoints[i].getPosition()));
-                if (firstIm.hoveredCircleIndex == i or secondIm.hoveredCircleIndex == i)tempCircle.setFillColor(sf::Color::Blue);
-                firstIm.internalTexture.draw(tempCircle);
-            }
-
-            
-
-
+          
             firstIm.internalTexture.display();
             window.draw(internalSprite);
-
-           
-
         }
         ImGui::End();
 
 
         ImGui::SetNextWindowPos(windowPos2);
         ImGui::SetNextWindowSize(windowSize);
-        ImGui::Begin("SECOND WINDOW", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin("SECOND WINDOW", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         if (secondIm.is_opened) {
             secondIm.internalTexture.clear();
             sf::Sprite internalSprite;
@@ -428,27 +434,17 @@ struct App {
 
             secondIm.internalTexture.draw(secondIm.sprite);
             
-            for (std::size_t i = 0; i < secondIm.drawPoints.size(); ++i) {
-                sf::CircleShape tempCircle = secondIm.drawPoints[i];
-                tempCircle.setPosition(secondIm.sprite.getTransform().transformPoint(secondIm.drawPoints[i].getPosition()));
-                if (firstIm.hoveredCircleIndex == i or secondIm.hoveredCircleIndex == i)tempCircle.setFillColor(sf::Color::Blue);
-                secondIm.internalTexture.draw(tempCircle);
-            }
-
-            
-
             secondIm.internalTexture.display();
-            window.draw(internalSprite);
-            
-            
+            window.draw(internalSprite);            
         }
         ImGui::End();
 
         ImGui::SetNextWindowPos(windowPos3);
         ImGui::SetNextWindowSize(windowSize);
-        ImGui::Begin("OVERLAY WINDOW", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoCollapse);
-        if (thirdIm.is_opened) {
-            thirdIm.internalTexture.clear();
+        ImGui::Begin("OVERLAY WINDOW", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+        if (firstIm.is_opened && secondIm.is_opened) {
+
+            overlayImage(firstIm, secondIm, thirdIm);
             sf::Sprite internalSprite;
             internalSprite.setTexture(thirdIm.internalTexture.getTexture());
             internalSprite.move(window.getSize().x / 3 * 2, 0);
@@ -456,10 +452,9 @@ struct App {
             thirdIm.sprite.setScale(thirdZoom, thirdZoom);
             thirdIm.internalTexture.draw(thirdIm.sprite);
 
-            
-
             thirdIm.internalTexture.display();
             window.draw(internalSprite);
+
 
             sf::RectangleShape cursor1_1(sf::Vector2f(18, 5));
             cursor1_1.setFillColor(sf::Color::Green);
@@ -488,6 +483,8 @@ struct App {
             if (activeImage != 0) {
                 window.draw(cursor1_4);
             }
+
+
 
             sf::RectangleShape cursor2_1(sf::Vector2f(18, 5));
             cursor2_1.setFillColor(sf::Color::Green);
@@ -520,6 +517,8 @@ struct App {
             if (activeImage != 1) {
                 window.draw(cursor2_4);
             }
+            
+
 
             sf::RectangleShape cursor3_1(sf::Vector2f(18, 5));
             cursor3_1.setFillColor(sf::Color::Green);
@@ -551,20 +550,20 @@ struct App {
             constrainCursorToBounds(thirdCursorPos, thirdIm);
             if (activeImage != 2) {
                 window.draw(cursor3_4);
-            }
-
-           
-
-            
+            }          
         }
         ImGui::End();
 
+        ImGui::PopStyleColor();
+        ImGui::PopStyleColor();
 
         ImGui::SFML::Render(window);
         window.display();
-
     }
 
+    /**
+     * @brief Запускает цикл приложения.
+     */
     void run() {
         ImGui::SFML::Init(window);
         while (window.isOpen()) {
@@ -577,6 +576,10 @@ struct App {
     }
 };
 
+/**
+ * @brief Главная функция, где создается объект App и запускается приложение.
+ * @return Статус завершения программы.
+ */
 int main() {
     App app;
     app.run();
