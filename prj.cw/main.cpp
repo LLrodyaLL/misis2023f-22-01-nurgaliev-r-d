@@ -22,20 +22,20 @@ struct App {
     sf::Vector2f secondCursorPos; /**< Позиция второго курсора. */
     sf::Vector2f thirdCursorPos; /**< Позиция третьего курсора. */
 
-    sf::Vector2f firstCursor1Pos; /**< Позиция первого курсора, точка 1. */
-    sf::Vector2f firstCursor2Pos; /**< Позиция первого курсора, точка 2. */
-    sf::Vector2f firstCursor3Pos; /**< Позиция первого курсора, точка 3. */
-    sf::Vector2f firstCursor4Pos; /**< Позиция первого курсора, точка 4. */
+    sf::Vector2f sideCursorRectangle1_1Pos; /**< Позиция прямоугольника 1_1 для создания вспомогательного курсора 1. */
+    sf::Vector2f sideCursorRectangle1_2Pos; /**< Позиция прямоугольника 1_2 для создания вспомогательного курсора 1. */
+    sf::Vector2f sideCursorRectangle1_3Pos; /**< Позиция прямоугольника 1_3 для создания вспомогательного курсора 2. */
+    sf::Vector2f sideCursorRectangle1_4Pos; /**< Позиция прямоугольника 1_4 для создания вспомогательного курсора 2. */
 
-    sf::Vector2f secondCursor1Pos; /**< Позиция второго курсора, точка 1. */
-    sf::Vector2f secondCursor2Pos; /**< Позиция второго курсора, точка 2. */
-    sf::Vector2f secondCursor3Pos; /**< Позиция второго курсора, точка 3. */
-    sf::Vector2f secondCursor4Pos; /**< Позиция второго курсора, точка 4. */
+    sf::Vector2f sideCursorRectangle2_1Pos; /**< Позиция прямоугольника 2_1 для создания вспомогательного курсора 3. */
+    sf::Vector2f sideCursorRectangle2_2Pos; /**< Позиция прямоугольника 2_2 для создания вспомогательного курсора 3. */
+    sf::Vector2f sideCursorRectangle2_3Pos; /**< Позиция прямоугольника 2_3 для создания вспомогательного курсора 4. */
+    sf::Vector2f sideCursorRectangle2_4Pos; /**< Позиция прямоугольника 2_4 для создания вспомогательного курсора 4. */
 
-    sf::Vector2f thirdCursor1Pos; /**< Позиция третьего курсора, точка 1. */
-    sf::Vector2f thirdCursor2Pos; /**< Позиция третьего курсора, точка 2. */
-    sf::Vector2f thirdCursor3Pos; /**< Позиция третьего курсора, точка 3. */
-    sf::Vector2f thirdCursor4Pos; /**< Позиция третьего курсора, точка 4. */
+    sf::Vector2f sideCursorRectangle3_1Pos; /**< Позиция прямоугольника 3_1 для создания вспомогательного курсора 5. */
+    sf::Vector2f sideCursorRectangle3_2Pos; /**< Позиция прямоугольника 3_2 для создания вспомогательного курсора 5. */
+    sf::Vector2f sideCursorRectangle3_3Pos; /**< Позиция прямоугольника 3_3 для создания вспомогательного курсора 6. */
+    sf::Vector2f sideCursorRectangle3_4Pos; /**< Позиция прямоугольника 3_4 для создания вспомогательного курсора 6. */
 
     sf::BlendMode overlayBlendMode; /**< Режим наложения для изображений. */
 
@@ -170,10 +170,10 @@ struct App {
 
                 sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-                if (mousePosition.x < window.getSize().x / 3) {
+                if (mousePosition.x < window.getSize().x / 3.0) {
                     activeImage = 0;
                 }
-                else if (mousePosition.x < window.getSize().x / 3 * 2) {
+                else if (mousePosition.x < window.getSize().x / 3.0 * 2) {
                     activeImage = 1;
                 }
                 else {
@@ -225,23 +225,23 @@ struct App {
                 thirdCursorPos = mousePosFloat - sf::Vector2f(window.getSize().x / 3.0f * 2.0f, 0);
 
 
-                firstCursor1Pos = sf::Vector2f(firstCursorPos.x - 6.6, firstCursorPos.y);
-                firstCursor2Pos = sf::Vector2f(firstCursorPos.x, firstCursorPos.y - 6.6);
+                sideCursorRectangle1_1Pos = sf::Vector2f(firstCursorPos.x - 6.6, firstCursorPos.y);
+                sideCursorRectangle1_2Pos = sf::Vector2f(firstCursorPos.x, firstCursorPos.y - 6.6);
 
-                firstCursor3Pos = sf::Vector2f(firstCursorPos.x - 6.6 - window.getSize().x / 3.0f, firstCursorPos.y);
-                firstCursor4Pos = sf::Vector2f(firstCursorPos.x - window.getSize().x / 3.0f, firstCursorPos.y - 6.6);
+                sideCursorRectangle1_3Pos = sf::Vector2f(firstCursorPos.x - 6.6 - window.getSize().x / 3.0f, firstCursorPos.y);
+                sideCursorRectangle1_4Pos = sf::Vector2f(firstCursorPos.x - window.getSize().x / 3.0f, firstCursorPos.y - 6.6);
 
-                secondCursor1Pos = sf::Vector2f(secondCursorPos.x - 6.6, secondCursorPos.y);
-                secondCursor2Pos = sf::Vector2f(secondCursorPos.x, secondCursorPos.y - 6.6);
+                sideCursorRectangle2_1Pos = sf::Vector2f(secondCursorPos.x - 6.6, secondCursorPos.y);
+                sideCursorRectangle2_2Pos = sf::Vector2f(secondCursorPos.x, secondCursorPos.y - 6.6);
 
-                secondCursor3Pos = sf::Vector2f(secondCursorPos.x - 6.6 + window.getSize().x, secondCursorPos.y);
-                secondCursor4Pos = sf::Vector2f(secondCursorPos.x + window.getSize().x, secondCursorPos.y - 6.6);
+                sideCursorRectangle2_3Pos = sf::Vector2f(secondCursorPos.x - 6.6 + window.getSize().x, secondCursorPos.y);
+                sideCursorRectangle2_4Pos = sf::Vector2f(secondCursorPos.x + window.getSize().x, secondCursorPos.y - 6.6);
 
-                thirdCursor1Pos = sf::Vector2f(thirdCursorPos.x - 6.6, thirdCursorPos.y);
-                thirdCursor2Pos = sf::Vector2f(thirdCursorPos.x, thirdCursorPos.y - 6.6);
+                sideCursorRectangle3_1Pos = sf::Vector2f(thirdCursorPos.x - 6.6, thirdCursorPos.y);
+                sideCursorRectangle3_2Pos = sf::Vector2f(thirdCursorPos.x, thirdCursorPos.y - 6.6);
 
-                thirdCursor3Pos = sf::Vector2f(thirdCursorPos.x - 6.6 + window.getSize().x, thirdCursorPos.y);
-                thirdCursor4Pos = sf::Vector2f(thirdCursorPos.x + window.getSize().x, thirdCursorPos.y - 6.6);
+                sideCursorRectangle3_3Pos = sf::Vector2f(thirdCursorPos.x - 6.6 + window.getSize().x, thirdCursorPos.y);
+                sideCursorRectangle3_4Pos = sf::Vector2f(thirdCursorPos.x + window.getSize().x, thirdCursorPos.y - 6.6);
 
 
                 // Проверка и коррекция границ курсоров
@@ -249,25 +249,7 @@ struct App {
                 constrainCursorToBounds(secondCursorPos, secondIm);
                 constrainCursorToBounds(thirdCursorPos, thirdIm);
 
-                sf::Vector2f localCursorPos1 = firstIm.sprite.getInverseTransform().transformPoint(firstCursorPos);
-                firstIm.cursor1_1.setPosition(localCursorPos1.x - 6.6, localCursorPos1.y);
-                firstIm.cursor1_2.setPosition(localCursorPos1.x, localCursorPos1.y - 6.6);
-                firstIm.cursor1_3.setPosition(localCursorPos1.x - 6.6 - window.getSize().x / 3.0f, localCursorPos1.y);
-                firstIm.cursor1_4.setPosition(localCursorPos1.x - window.getSize().x / 3.0f, localCursorPos1.y - 6.6);
 
-                sf::Vector2f localCursorPos2 = secondIm.sprite.getInverseTransform().transformPoint(secondCursorPos);
-                secondIm.cursor2_1.setPosition(localCursorPos2.x - 6.6, localCursorPos2.y);
-                secondIm.cursor2_2.setPosition(localCursorPos2.x, localCursorPos2.y - 6.6);
-                secondIm.cursor2_3.setPosition(localCursorPos2.x - 6.6 + window.getSize().x, localCursorPos2.y);
-                secondIm.cursor2_4.setPosition(localCursorPos2.x + window.getSize().x, localCursorPos2.y - 6.6);
-
-                sf::Vector2f localCursorPos3 = thirdIm.sprite.getInverseTransform().transformPoint(thirdCursorPos);
-                thirdIm.cursor3_1.setPosition(localCursorPos3.x - 6.6, localCursorPos3.y);
-                thirdIm.cursor3_2.setPosition(localCursorPos3.x, localCursorPos3.y - 6.6);
-                thirdIm.cursor3_3.setPosition(localCursorPos3.x - 6.6 + window.getSize().x, localCursorPos3.y);
-                thirdIm.cursor3_4.setPosition(localCursorPos3.x + window.getSize().x, localCursorPos3.y - 6.6);
-
-               
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
                     translate += newCoord - mouseCoord;
                 }
@@ -428,7 +410,7 @@ struct App {
             secondIm.internalTexture.clear();
             sf::Sprite internalSprite;
             internalSprite.setTexture(secondIm.internalTexture.getTexture());
-            internalSprite.move(window.getSize().x / 3, 0);
+            internalSprite.move(window.getSize().x / 3.0, 0);
             secondIm.sprite.setPosition(translate);
             secondIm.sprite.setScale(secondZoom, secondZoom);
 
@@ -447,7 +429,7 @@ struct App {
             overlayImage(firstIm, secondIm, thirdIm);
             sf::Sprite internalSprite;
             internalSprite.setTexture(thirdIm.internalTexture.getTexture());
-            internalSprite.move(window.getSize().x / 3 * 2, 0);
+            internalSprite.move(window.getSize().x / 3.0 * 2, 0);
             thirdIm.sprite.setPosition(translate);
             thirdIm.sprite.setScale(thirdZoom, thirdZoom);
             thirdIm.internalTexture.draw(thirdIm.sprite);
@@ -458,28 +440,28 @@ struct App {
 
             sf::RectangleShape cursor1_1(sf::Vector2f(18, 5));
             cursor1_1.setFillColor(sf::Color::Green);
-            cursor1_1.setPosition(firstCursor1Pos);
+            cursor1_1.setPosition(sideCursorRectangle1_1Pos);
             if (activeImage != 0) {
                 window.draw(cursor1_1);
             }
 
             sf::RectangleShape cursor1_2(sf::Vector2f(5, 18));
             cursor1_2.setFillColor(sf::Color::Green);
-            cursor1_2.setPosition(firstCursor2Pos);
+            cursor1_2.setPosition(sideCursorRectangle1_2Pos);
             if (activeImage != 0) {
                 window.draw(cursor1_2);
             }
 
             sf::RectangleShape cursor1_3(sf::Vector2f(18, 5));
             cursor1_3.setFillColor(sf::Color::Green);
-            cursor1_3.setPosition(firstCursor3Pos);
+            cursor1_3.setPosition(sideCursorRectangle1_3Pos);
             if (activeImage != 0) {
                 window.draw(cursor1_3);
             }
 
             sf::RectangleShape cursor1_4(sf::Vector2f(5, 18));
             cursor1_4.setFillColor(sf::Color::Green);
-            cursor1_4.setPosition(firstCursor4Pos);
+            cursor1_4.setPosition(sideCursorRectangle1_4Pos);
             if (activeImage != 0) {
                 window.draw(cursor1_4);
             }
@@ -488,7 +470,7 @@ struct App {
 
             sf::RectangleShape cursor2_1(sf::Vector2f(18, 5));
             cursor2_1.setFillColor(sf::Color::Green);
-            cursor2_1.setPosition(secondCursor1Pos);
+            cursor2_1.setPosition(sideCursorRectangle2_1Pos);
             constrainCursorToBounds(secondCursorPos, secondIm);
             if (activeImage != 1) {
                 window.draw(cursor2_1);
@@ -496,7 +478,7 @@ struct App {
 
             sf::RectangleShape cursor2_2(sf::Vector2f(5, 18));
             cursor2_2.setFillColor(sf::Color::Green);
-            cursor2_2.setPosition(secondCursor2Pos);
+            cursor2_2.setPosition(sideCursorRectangle2_2Pos);
             constrainCursorToBounds(secondCursorPos, secondIm);
             if (activeImage != 1) {
                 window.draw(cursor2_2);
@@ -504,7 +486,7 @@ struct App {
 
             sf::RectangleShape cursor2_3(sf::Vector2f(18, 5));
             cursor2_3.setFillColor(sf::Color::Green);
-            cursor2_3.setPosition(secondCursor3Pos);
+            cursor2_3.setPosition(sideCursorRectangle2_3Pos);
             constrainCursorToBounds(secondCursorPos, secondIm);
             if (activeImage != 1) {
                 window.draw(cursor2_3);
@@ -512,7 +494,7 @@ struct App {
 
             sf::RectangleShape cursor2_4(sf::Vector2f(5, 18));
             cursor2_4.setFillColor(sf::Color::Green);
-            cursor2_4.setPosition(secondCursor4Pos);
+            cursor2_4.setPosition(sideCursorRectangle2_4Pos);
             constrainCursorToBounds(secondCursorPos, secondIm);
             if (activeImage != 1) {
                 window.draw(cursor2_4);
@@ -522,7 +504,7 @@ struct App {
 
             sf::RectangleShape cursor3_1(sf::Vector2f(18, 5));
             cursor3_1.setFillColor(sf::Color::Green);
-            cursor3_1.setPosition(thirdCursor1Pos);
+            cursor3_1.setPosition(sideCursorRectangle3_1Pos);
             constrainCursorToBounds(thirdCursorPos, thirdIm);
             if (activeImage != 2) {
                 window.draw(cursor3_1);
@@ -530,7 +512,7 @@ struct App {
 
             sf::RectangleShape cursor3_2(sf::Vector2f(5, 18));
             cursor3_2.setFillColor(sf::Color::Green);
-            cursor3_2.setPosition(thirdCursor2Pos);
+            cursor3_2.setPosition(sideCursorRectangle3_2Pos);
             constrainCursorToBounds(thirdCursorPos, thirdIm);
             if (activeImage != 2) {
                 window.draw(cursor3_2);
@@ -538,7 +520,7 @@ struct App {
 
             sf::RectangleShape cursor3_3(sf::Vector2f(18, 5));
             cursor3_3.setFillColor(sf::Color::Green);
-            cursor3_3.setPosition(thirdCursor3Pos);
+            cursor3_3.setPosition(sideCursorRectangle3_3Pos);
             constrainCursorToBounds(thirdCursorPos, thirdIm);
             if (activeImage != 2) {
                 window.draw(cursor3_3);
@@ -546,7 +528,7 @@ struct App {
 
             sf::RectangleShape cursor3_4(sf::Vector2f(5, 18));
             cursor3_4.setFillColor(sf::Color::Green);
-            cursor3_4.setPosition(thirdCursor4Pos);
+            cursor3_4.setPosition(sideCursorRectangle3_4Pos);
             constrainCursorToBounds(thirdCursorPos, thirdIm);
             if (activeImage != 2) {
                 window.draw(cursor3_4);
