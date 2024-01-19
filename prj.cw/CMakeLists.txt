@@ -45,7 +45,9 @@ if(DOXYGEN_FOUND)
 
 endif()
 
+install (TARGETS astMarker)
+
 if(DOXYGEN_FOUND)
-       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doxygen_docs/latex
+       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/prj.cw/rtf
                DESTINATION docs)
    endif()
