@@ -48,6 +48,6 @@ endif()
 install (TARGETS astMarker)
 
 if(DOXYGEN_FOUND)
-       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/prj.cw/rtf
+       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/rtf
                DESTINATION docs)
    endif()
